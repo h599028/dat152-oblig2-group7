@@ -22,20 +22,52 @@ public class AuthorService {
 
 	@Autowired
 	private AuthorRepository authorRepository;
-	
-	
+
 	public Author saveAuthor(Author author) {
-		
-		// TODO
-		return null;
+
+		return authorRepository.save(author);
+
 	}
-	
+
+	public List<Author> findAll() {
+
+		return (List<Author>) authorRepository.findAll();
+
+	}
+
 	public Author findById(long id) throws AuthorNotFoundException {
-		
+
 		Author author = authorRepository.findById(id)
-				.orElseThrow(()-> new AuthorNotFoundException("Author with the id: "+id+ "not found!"));
-		
+				.orElseThrow(() -> new AuthorNotFoundException("Author with the id: " + id + "not found!"));
+
 		return author;
+	}
+
+	public Author updateAuthor(Author author) {
+
+		long id = author.getAuthorId();
+
+		deleteByID(id);
+		authorRepository.save(author);
+
+		return author;
+
+	}
+
+	public Author deleteByID(long id) {
+
+		Author author = null;
+
+		try {
+			author = findById(id);
+		} catch (AuthorNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		authorRepository.delete(author);
+
+		return author;
+
 	}
 
 }

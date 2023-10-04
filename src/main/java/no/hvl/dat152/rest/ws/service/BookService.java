@@ -35,10 +35,11 @@ public class BookService {
 	
 	public Book updateBook(Book book, String isbn) 
 			throws BookNotFoundException, UpdateBookFailedException {
+
+		deleteByISBN(isbn);
+		bookRepository.save(book);
 		
-		// TODO
-		
-		return null;
+		return book;
 	}
 	
 	public List<Book> findAll(){
@@ -79,7 +80,8 @@ public class BookService {
 	
 	public void deleteByISBN(String isbn) throws BookNotFoundException {
 		
-		// TODO
+		Book book = bookRepository.findBookByISBN(isbn);
+		bookRepository.delete(book);
 
 	}
 	
