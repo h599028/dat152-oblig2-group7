@@ -72,9 +72,10 @@ public class BookService {
 	
 	public Set<Author> findAuthorsByBookISBN(String isbn) throws BookNotFoundException{
 		
-		// TODO
+		Book book = findByISBN(isbn);
+		Set<Author> authors = book.getAuthors();
 		
-		return null;
+		return authors;
 		
 	}
 	
