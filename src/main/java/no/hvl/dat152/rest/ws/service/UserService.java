@@ -33,17 +33,19 @@ public class UserService {
 	
 	public void deleteUser(Long id) throws UserNotFoundException {
 		
-		// TODO
-	}
-	
-	public User updateUser(User user, Long id) throws UserNotFoundException {
-		
 		User bruker = userRepository.findById(id)
 				.orElseThrow(()-> new UserNotFoundException("Order with id: "+id+" not found in the order list!"));
 		
 		userRepository.delete(bruker);
+
+	}
+	
+	public User updateUser(User user, Long id) throws UserNotFoundException {
 		
-		return bruker;
+		userRepository.deleteById(id);
+		userRepository.save(user);
+		
+		return user;		
 		
 	}
 	
