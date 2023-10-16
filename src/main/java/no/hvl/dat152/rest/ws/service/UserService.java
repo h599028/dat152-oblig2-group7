@@ -9,6 +9,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import no.hvl.dat152.rest.ws.exceptions.OrderNotFoundException;
 import no.hvl.dat152.rest.ws.exceptions.UserNotFoundException;
 import no.hvl.dat152.rest.ws.model.Order;
 import no.hvl.dat152.rest.ws.model.User;
@@ -37,7 +38,10 @@ public class UserService {
 	
 	public User updateUser(User user, Long id) throws UserNotFoundException {
 		
-		// TODO
+		User bruker = userRepository.findById(id)
+				.orElseThrow(()-> new UserNotFoundException("Order with id: "+id+" not found in the order list!"));
+		
+		userRepository.delete(bruker);
 		
 		return null;
 		
