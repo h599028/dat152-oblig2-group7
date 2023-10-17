@@ -50,7 +50,7 @@ public class OrderService {
 	public List<Order> findByExpiryDate(LocalDate expiry, Pageable page){
 		
 		int limit = page.getPageSize();
-		int offset = page.getPageNumber();
+		int offset = page.getPageNumber() * limit;
 		
 		return (List<Order>) orderRepository.findOrderByExpiry(expiry, limit, offset);
 	}

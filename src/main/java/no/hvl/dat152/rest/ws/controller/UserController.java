@@ -102,9 +102,8 @@ public class UserController {
 	public ResponseEntity<Object> createUserOrders(@PathVariable("id") Long id, @RequestBody Order order) 
 			throws UserNotFoundException, OrderNotFoundException{
 		
-		// TODO
+		return new ResponseEntity<>(userService.createOrdersForUser(id, order), HttpStatus.OK);
 		
-		return null;
 	}
 	
 	private void addLinks(Set<Order> orders) throws OrderNotFoundException {

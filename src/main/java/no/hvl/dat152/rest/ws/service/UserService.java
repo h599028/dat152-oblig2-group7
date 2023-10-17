@@ -73,8 +73,11 @@ public class UserService {
 	
 	public User createOrdersForUser(Long id, Order order) throws UserNotFoundException{
 		
-		// TODO
+		User user = findUser(id);
 		
-		return null;
+		user.getOrders().add(order);
+		userRepository.save(user);
+		
+		return user;
 	}
 }

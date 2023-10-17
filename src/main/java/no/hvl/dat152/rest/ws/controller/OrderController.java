@@ -48,8 +48,6 @@ public class OrderController {
 			@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "3") int size){
 		
-		// TODO
-		
 		return null;
 	}
 	

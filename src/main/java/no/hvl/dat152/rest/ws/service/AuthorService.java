@@ -43,14 +43,19 @@ public class AuthorService {
 		return author;
 	}
 
-	public Author updateAuthor(Author author) {
+	public Author updateAuthor(Author author) throws AuthorNotFoundException{
 
 		long id = author.getAuthorId();
+		Author nauthor = null;
 
-		deleteByID(id);
-		authorRepository.save(author);
-
-		return author;
+		try {
+			nauthor = findById(id);
+			authorRepository.save(nauthor);
+		} catch (AuthorNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		return nauthor;
 
 	}
 
