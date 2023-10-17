@@ -41,50 +41,77 @@ public class OrderController {
 	@Autowired
 	private OrderService orderService;
 
-	
 	@GetMapping("/orders")
-	public ResponseEntity<Object> getAllBorrowOrders(
-			@RequestParam(required = false) LocalDate expiry, 
-			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "3") int size){
-		
-		return null;
+	public ResponseEntity<Object> getAllBorrowOrders(@RequestParam(required = false) LocalDate expiry,
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "3") int size) {
+
+		Pageable paging = PageRequest.of(page, size);
+
+		Page<Order> orderPage;
+		if (expiry != null) {
+			orderPage = orderService.findByExpiryDate(expiry, paging);
+		} else {
+			orderPage = orderService.findAllOrders();
+		}
+
+		// Create links for pagination
+		List<Link> links = new ArrayList<>();
+		if (orderPage.hasPrevious()) {
+			Link prevLink = linkTo(methodOn(OrderController.class).getAllBorrowOrders(expiry, page - 1, size))
+					.withRel("prev");
+			links.add(prevLink);
+		}
+		if (orderPage.hasNext()) {
+			Link nextLink = linkTo(methodOn(OrderController.class).getAllBorrowOrders(expiry, page + 1, size))
+					.withRel("next");
+			links.add(nextLink);
+		}
+
+		// Create a response object with orders and links
+		ResponseEntity<Object> responseEntity = new ResponseEntity<>(orderPage.getContent(), HttpStatus.OK);
+		if (!links.isEmpty()) {
+			responseEntity = ResponseEntity.status(HttpStatus.OK).body(orderPage.getContent());
+			responseEntity.getHeaders().add("Links", links.toString());
+		}
+
+		return responseEntity;
 	}
-	
+
 	@GetMapping("/orders/{id}")
-	public ResponseEntity<Object> getBorrowOrder(@PathVariable("id") Long id) throws OrderNotFoundException{
-		
+	public ResponseEntity<Object> getBorrowOrder(@PathVariable("id") Long id) throws OrderNotFoundException {
+
 		try {
 			Order order = orderService.findOrder(id);
 			return new ResponseEntity<>(order, HttpStatus.OK);
-			
-		}catch(OrderNotFoundException e) {
+
+		} catch (OrderNotFoundException e) {
 
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}	
-		
+		}
+
 	}
-	
+
 	@PutMapping("/orders/{id}")
-	public ResponseEntity<Object> updateOrder(@PathVariable("id") Long id, @RequestBody Order order) 
-			throws OrderNotFoundException, UserNotFoundException{
+	public ResponseEntity<Object> updateOrder(@PathVariable("id") Long id, @RequestBody Order order)
+			throws OrderNotFoundException, UserNotFoundException {
 
 		order = orderService.updateOrder(order, id);
-		Link rordersLink = linkTo(methodOn(OrderController.class).returnBookOrder(id)).withRel("Update_Return_or_Cancel");
+		Link rordersLink = linkTo(methodOn(OrderController.class).returnBookOrder(id))
+				.withRel("Update_Return_or_Cancel");
 		order.add(rordersLink);
-		
+
 		return new ResponseEntity<>(order, HttpStatus.OK);
 	}
-	
+
 	@DeleteMapping("/orders/{id}")
-	public ResponseEntity<Object> returnBookOrder(@PathVariable("id") Long id) throws OrderNotFoundException{
-		
+	public ResponseEntity<Object> returnBookOrder(@PathVariable("id") Long id) throws OrderNotFoundException {
+
 		try {
 			orderService.deleteOrder(id);
-			return new ResponseEntity<>("Order with id: '"+id+"' deleted!", HttpStatus.OK);
+			return new ResponseEntity<>("Order with id: '" + id + "' deleted!", HttpStatus.OK);
 		} catch (OrderNotFoundException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 }
