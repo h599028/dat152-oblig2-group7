@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
@@ -47,32 +48,26 @@ public class OrderController {
 
 		Pageable paging = PageRequest.of(page, size);
 
-		Page<Order> orderPage;
+		List<Order> orderList;
 		if (expiry != null) {
-			orderPage = orderService.findByExpiryDate(expiry, paging);
+			orderList = orderService.findByExpiryDate(expiry, paging);
 		} else {
-			orderPage = orderService.findAllOrders();
+			orderList = orderService.findAllOrders();
 		}
 
 		// Create links for pagination
-		List<Link> links = new ArrayList<>();
-		if (orderPage.hasPrevious()) {
-			Link prevLink = linkTo(methodOn(OrderController.class).getAllBorrowOrders(expiry, page - 1, size))
-					.withRel("prev");
-			links.add(prevLink);
-		}
-		if (orderPage.hasNext()) {
-			Link nextLink = linkTo(methodOn(OrderController.class).getAllBorrowOrders(expiry, page + 1, size))
-					.withRel("next");
-			links.add(nextLink);
-		}
+	    List<Link> links = new ArrayList<>();
+	    if (orderList.size() > size) {
+	        Link nextLink = linkTo(methodOn(OrderController.class).getAllBorrowOrders(expiry, page + 1, size))
+	                .withRel("next");
+	        links.add(nextLink);
+	    }
 
 		// Create a response object with orders and links
-		ResponseEntity<Object> responseEntity = new ResponseEntity<>(orderPage.getContent(), HttpStatus.OK);
-		if (!links.isEmpty()) {
-			responseEntity = ResponseEntity.status(HttpStatus.OK).body(orderPage.getContent());
-			responseEntity.getHeaders().add("Links", links.toString());
-		}
+	    ResponseEntity<Object> responseEntity = new ResponseEntity<>(orderList, HttpStatus.OK);
+	    if (!links.isEmpty()) {
+	        responseEntity.getHeaders().add("Links", links.toString());
+	    }
 
 		return responseEntity;
 	}
