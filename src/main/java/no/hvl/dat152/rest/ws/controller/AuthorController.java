@@ -63,6 +63,7 @@ public class AuthorController {
 
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+		}
 
 	@PutMapping("/authors/{id}")
 	public ResponseEntity<Object> updateAuthor(@RequestBody Author author, @PathVariable("id") long id) {
