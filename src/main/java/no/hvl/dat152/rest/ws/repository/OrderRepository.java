@@ -20,10 +20,10 @@ import no.hvl.dat152.rest.ws.model.Order;
  */
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-	@Query(value = "SELECT user_id FROM order WHERE id = :id", nativeQuery=true)
+	@Query(value = "SELECT user_id FROM orders WHERE id = :id", nativeQuery=true)
 	Long findUserID(@Param("id") Long id);
 	
-	@Query(value = "SELECT id, isbn, expiry FROM order WHERE expiry <= :expiry limit :limit offset :offset ", nativeQuery=true)
+	@Query(value = "SELECT id, isbn, expiry FROM orders WHERE expiry <= :expiry limit :limit offset :offset ", nativeQuery=true)
 	List<Order> findOrderByExpiry(
 			@Param("expiry") LocalDate expiry,
 			@Param("limit") int limit,

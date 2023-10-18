@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -47,14 +48,17 @@ public class OrderController {
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "3") int size) {
 
 		Pageable paging = PageRequest.of(page, size);
-
+		
 		List<Order> orderList;
-		if (expiry != null) {
-			orderList = orderService.findByExpiryDate(expiry, paging);
-		} else {
-			orderList = orderService.findAllOrders();
+		try {
+		    if (expiry != null) {
+		        orderList = orderService.findByExpiryDate(expiry, paging);
+		    } else {
+		        orderList = orderService.findAllOrders();
+		    }
+		} catch (Exception e) {
+		    return new ResponseEntity<>("Error fetching: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
 		// Create links for pagination
 	    List<Link> links = new ArrayList<>();
 	    if (orderList.size() > size) {
@@ -103,7 +107,7 @@ public class OrderController {
 
 		try {
 			orderService.deleteOrder(id);
-			return new ResponseEntity<>("Order with id: '" + id + "' deleted!", HttpStatus.OK);
+			return new ResponseEntity<>("Order with id: " + id + " is deleted." , HttpStatus.OK);
 		} catch (OrderNotFoundException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
