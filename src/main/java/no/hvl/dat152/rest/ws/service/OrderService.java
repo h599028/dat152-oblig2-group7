@@ -65,9 +65,16 @@ public class OrderService {
 	
 	public Order updateOrder(Order order, Long id) throws OrderNotFoundException {
 		
-		orderRepository.deleteById(id);
-		orderRepository.save(order);
+		Order update = orderRepository.findById(id)
+				.orElseThrow(()-> new OrderNotFoundException("Order with id: "+id+" not found in the order list!"));
 		
-		return order;			
+		update.setExpiry(order.getExpiry());
+		update.setId(order.getId());
+		update.setIsbn(order.getIsbn());
+		
+		update = orderRepository.save(update);
+		
+		return update;
+			
 	}
 }
